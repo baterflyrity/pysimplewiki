@@ -1,3 +1,3 @@
 # Simple Wiki
 
-[Подробнее](wiki/Simple Wiki/Главная.md)
+[Подробнее](https://github.com/baterflyrity/pysimplewiki/blob/main/wiki/Simple%20Wiki/Главная.md)
