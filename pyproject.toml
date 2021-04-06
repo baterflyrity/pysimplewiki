@@ -3,7 +3,7 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
-module = "wiki.py"
+module = "wikiserver"
 author = "baterflyrity"
 author-email = "baterflyrity@yandex.ru"
 home-page = "https://github.com/baterflyrity/pysimplewiki"
@@ -24,4 +24,4 @@ keywords = "wiki, engine, markdown, web, server"
 Bugtracker = "https://github.com/baterflyrity/pysimplewiki/issues"
 
 [tool.flit.scripts]
-simplewiki = "wiki.py:main"
+simplewiki = "wikiserver:main"
