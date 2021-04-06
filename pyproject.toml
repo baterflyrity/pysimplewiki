@@ -17,7 +17,7 @@ requires = [
     'attributedict == 0.3.0'
 ]
 requires-python = "~=3.8"
-description-file = "wiki/Simple Wiki/Simple Wiki.md"
+description-file = "wiki\\Simple Wiki\\Главная.md"
 keywords = "wiki, engine, markdown, web, server"
 
 [tool.flit.metadata.urls]
