@@ -1,0 +1,12 @@
+<div class="side-block">
+	{% if label %}
+		<h3>{{ label }}</h3>
+	{% endif %}
+	<div>
+		<ul>
+			{% for link in links %}
+				<li><a href="{{ link.url }}">{{ link.name }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>

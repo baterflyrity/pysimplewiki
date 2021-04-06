@@ -1,0 +1,19 @@
+<h1>Раздел: {{ section }}</h1>
+{% if subsections|length>0 %}
+	<h2>Подразделы</h2>
+	<p>В этом разделе найдено подразделов: {{ subsections|length }}.</p>
+	<ul style="columns:2;list-style-type:square">
+		{% for link in subsections %}
+			<li><a href="{{ link.url }}">{{ link.name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}
+{% if pages|length>0 %}
+	<h2>Статьи</h2>
+	<p>В этом разделе найдено статей: {{ pages|length }}.</p>
+	<ul style="columns:2;list-style-type:disc">
+		{% for link in pages %}
+			<li><a href="{{ link.url }}">{{ link.name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endif %}

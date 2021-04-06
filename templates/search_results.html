@@ -1,0 +1,16 @@
+<h1>Результаты поиска: {{ query }}</h1>
+{% if found|length==0 %}
+	{% if query|length<3 %}
+		<p>Запрос должен состоять минимум из трёх символов.</p>
+	{% else %}
+		<p>Соответствий запросу не найдено.</p>
+	{% endif %}
+{% else %}
+	<ul style="margin: 0;padding: 0;list-style-type: none;">
+		{% for link in found %}
+			<li style="padding-bottom: 24px;margin-bottom: 0.1em;line-height: 1.6;">
+				<a href="{{ link.url }}">{{ link.name }}</a>
+			</li>
+		{% endfor %}
+	</ul>
+{% endif %}

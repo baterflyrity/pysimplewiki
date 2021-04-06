@@ -1,0 +1,10 @@
+{
+  "mermaid_theme": "neutral",
+  "markdown_extensions": [],
+  "short_title": "Simple Wiki",
+  "full_title": "Simple Wiki",
+  "icon": "favicon.png",
+  "logo": "logo.html",
+  "interface": "0.0.0.0",
+  "port": 80
+}

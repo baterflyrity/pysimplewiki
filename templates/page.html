@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<link rel="icon" type="image/png" href="{{ icon }}"/>
+	<link rel="stylesheet" href="/highlight.css">
+	<script src="/highlight.js"></script>
+	<script src="/mermaid.min.js"></script>
+	<title>{{ config.short_title | safe }}</title>
+	<style>
+		body {
+			padding: 0;
+			background-color: rgb(246, 246, 246);
+			height: 100%;
+			margin: 0;
+		}
+
+		a {
+			color: rgb(6, 69, 173);
+			text-decoration: none;
+		}
+
+		a:hover, a:focus {
+			text-decoration: underline;
+		}
+
+		a:visited {
+			color: rgb(11, 0, 128);
+		}
+
+		#top-space {
+			background-color: rgb(251, 251, 251);
+			background-image: -webkit-gradient(linear, right top, right bottom, color-stop(50%, #ffffff), color-stop(100%, #f6f6f6));
+			background-image: -webkit-linear-gradient(top, #ffffff 50%, #f6f6f6 100%);
+			background-image: -moz-linear-gradient(top, rgb(255, 255, 255) 50%, rgb(246, 246, 246) 100%);
+			background-image: linear-gradient(to bottom, rgb(255, 255, 255) 50%, rgb(246, 246, 246) 100%);
+			background-position: bottom left;
+			height: 5em;
+		}
+
+		#top-space > h1 {
+			position: absolute;
+			z-index: 10;
+			margin-left: 11rem;
+			top: -.5em;
+		}
+
+		#top-space > form {
+			position: absolute;
+			z-index: 11;
+			right: 1em;
+			top: 5em;
+			margin-top: -2em;
+		}
+
+		#top-space > form > div {
+			position: relative;
+			height: 100%;
+			min-width: 5em;
+			width: 20vw;
+			max-width: 20em;
+		}
+
+		#top-space > form > div > input[type="search"] {
+			background-color: rgba(255, 255, 255, 0.5);
+			color: rgb(0, 0, 0);
+			width: 100%;
+			height: 2.15384615em;
+			box-sizing: border-box;
+			border: 1px solid rgb(162, 169, 177);
+			border-radius: 2px;
+			padding: 5px 2.15384615em 5px 0.4em;
+			box-shadow: inset 0 0 0 1px transparent;
+			font-family: inherit;
+			font-size: 0.8125em;
+			transition: border-color 250ms, box-shadow 250ms;
+			margin: 0;
+		}
+
+		#top-space > form > div > input[type="submit"] {
+			background: no-repeat center / 1.23076923em url(/search.svg);
+			opacity: 0.67;
+			position: absolute;
+			top: 1px;
+			bottom: 1px;
+			right: 1px;
+			min-width: 28px;
+			width: 2.15384615em;
+			margin: 0;
+			border: 0;
+			padding: 0;
+			cursor: pointer;
+			font-size: 0.8125em;
+			direction: ltr;
+			text-indent: -99999px;
+			white-space: nowrap;
+			overflow: hidden;
+			z-index: 12;
+		}
+
+		#content {
+			padding: 1.25em 1.5em 1.5em 1.5em;
+			margin-left: 11em;
+			border: 1px solid rgb(167, 215, 249);
+			border-right-width: 0;
+			background: white;
+		}
+
+		#content dl {
+			margin-top: 0.2em;
+			margin-bottom: 0.5em;
+		}
+
+		#content dt {
+			font-weight: bold;
+			margin-bottom: 0.1em;
+		}
+
+		#content table {
+			background-color: rgb(248, 249, 250);
+			color: rgb(32, 33, 34);
+			margin: 1em 0;
+			border: 1px solid rgb(162, 169, 177);
+			border-collapse: collapse;
+			display: table;
+			border-spacing: 2px;
+			box-sizing: border-box;
+			text-indent: 0;
+		}
+
+		#content table th {
+			background-color: rgb(234, 236, 240);
+			text-align: center;
+			border: 1px solid rgb(162, 169, 177);
+			padding: 0.2em 0.4em;
+			font-weight: bold;
+		}
+
+		#content table td {
+			border: 1px solid rgb(162, 169, 177);
+			padding: 0.2em 0.4em;
+		}
+
+
+		#content dd {
+			margin-left: 1.6em;
+			margin-right: 0;
+			margin-bottom: 0.1em;
+			display: block;
+			margin-inline-start: 40px;
+		}
+
+		#content pre {
+			border: 1px solid rgb(234, 236, 240);
+			font-family: Consolas, monospace;
+		}
+
+		#content .admonition {
+			border: 1px solid rgb(170, 170, 170);
+			margin: 4px 10%;
+			border-collapse: collapse;
+			background: rgb(249, 249, 249);
+			padding: 0.25em 0.9em;
+		}
+
+		#content .admonition > .admonition-title {
+			font-weight: bold;
+		}
+
+		#content .admonition.hint {
+			border-left: 10px solid #1976D2;
+			background-color: #EAF3FF;
+		}
+
+		#content .admonition.alert {
+			border-left: 10px solid rgb(242, 133, 0);
+			background-color: #FEFAEF;
+		}
+
+		#content .admonition.danger {
+			border-left: 10px solid rgb(210, 25, 25);
+			background-color: #FFE5E5;
+		}
+
+		#side-bar {
+			position: absolute;
+			top: 0;
+			width: 10em;
+			left: 0;
+			padding-left: 0.5em;
+		}
+
+		#logo {
+			width: 10em;
+			height: 160px;
+			margin-bottom: 1em;
+			margin-top: 1em;
+		}
+
+		#logo + div {
+			margin-top: 2em;
+		}
+
+		#side-bar .side-block {
+			margin: 0 0.6em 0 0.7em;
+			padding: 0.25em 0;
+		}
+
+		#side-bar .side-block > h3 {
+			display: block;
+			background-image: linear-gradient(to right, rgba(200, 204, 209, 0) 0, rgb(200, 204, 209) 33%, rgb(200, 204, 209) 66%, rgba(200, 204, 209, 0) 100%);
+			background-position: center bottom;
+			background-repeat: no-repeat;
+			background-size: 100% 1px;
+			color: rgb(84, 89, 93);
+			margin: 0.5em 0 0 0.66666667em;
+			border: 0;
+			padding: 0.25em 0;
+			font-size: 0.75em;
+			font-weight: normal;
+			cursor: default;
+			overflow: hidden;
+			margin-block-start: 1em;
+			margin-block-end: 1em;
+		}
+
+		#side-bar .side-block > div {
+			margin-top: -1em;
+			margin-left: 0.5em;
+			padding-top: 0;
+		}
+
+		#side-bar .side-block > div > ul {
+			list-style: none none;
+			margin: 0;
+			counter-reset: list-item;
+			padding: 0.3em 0 0;
+			display: block;
+			margin-block-start: 1em;
+			margin-block-end: 1em;
+		}
+
+		#side-bar .side-block > div > ul > li {
+			margin: 0;
+			padding: 0.25em 0;
+		{#font-size: 0.75em;#} {#line-height: 1.125em;#} line-height: 12px;
+			word-wrap: break-word;
+			display: list-item;
+			text-align: match-parent;
+			list-style: none none;
+		}
+
+		#side-bar .side-block > div > ul > li > a {
+			font-size: 0.75em;
+			line-height: 1.125em;
+			word-wrap: break-word;
+			text-align: match-parent;
+			list-style: none none;
+		}
+
+		#content h1, h2, h3, h4, h5, h6 {
+			border-bottom: 1px solid rgb(162, 169, 177);
+			margin: 1em 0 0.25em;
+			line-height: 1.3;
+		{#font-size: 1.5em;#} font-weight: normal;
+		}
+
+
+		#content h1:first {
+			padding-top: 0;
+		}
+
+		#content blockquote {
+			padding: 0.25em 1em;
+			border-left: 4px solid rgb(234, 236, 240);
+			margin: 0.7em 0 0.7em 5%;
+			background: rgb(248, 249, 250);
+			display: block;
+			margin-block-start: 1em;
+			margin-block-end: 1em;
+			margin-inline-start: 40px;
+			margin-inline-end: 40px;
+			font-size: calc(1em * 0.875);
+		}
+	</style>
+</head>
+<body>
+<div id="top-space">
+	<h1>{{ config.full_title }}</h1>
+	<form>
+		<div>
+			<input type="search" name="search" placeholder="Искать на вики" autocapitalize="sentences" title="Искать на вики [Alt+Shift+f]" accesskey="f" autocomplete="off">
+			<input type="submit" title="Искать">
+		</div>
+	</form>
+</div>
+<div id="content">{{ content|safe }}</div>
+<div id="side-bar">
+	<div id="logo">{{ logo|safe }}</div>
+	<div>{{ sidebar|safe }}</div>
+</div>
+</body>
+<script>
+	MathJax = {
+		options: {
+			renderActions: {
+				find: [10, function (doc) {
+					for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+						const display = !!node.type.match(/; *mode=display/);
+						const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+						const text = document.createTextNode('');
+						node.parentNode.replaceChild(text, node);
+						math.start = {node: text, delim: '', n: 0};
+						math.end = {node: text, delim: '', n: 0};
+						doc.math.push(math);
+					}
+				}, '']
+			}
+		}
+	};
+</script>
+<script type="text/javascript" src="/mathjax.js"></script>
+<script>
+	document.querySelector('#top-space>form').addEventListener('submit', e => {
+		e.preventDefault();
+		window.location.href = '/search/' + encodeURIComponent(document.querySelector('#top-space>form input[type="search"]').value);
+		return false;
+	});
+	document.addEventListener('DOMContentLoaded', _ => {
+		mermaid.initialize({'theme': '{{ config.mermaid_theme }}'});
+		document.querySelectorAll('code').forEach((block) => {
+			if (block.classList.contains('lang-mermaid')) {
+				let e = document.createElement('div');
+				e.classList.add('mermaid');
+				e.innerHTML = block.innerHTML;
+				block.parentElement.replaceWith(e);
+			} else hljs.highlightBlock(block);
+		});
+	});
+</script>
+</html>

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "wiki"
+author = "baterflyrity"
+author-email = "baterflyrity@yandex.ru"
+home-page = "https://github.com/baterflyrity/pysimplewiki"
+classifiers = [ "License :: OSI Approved :: MIT License",]
+requires = [
+    "typer[all] == 0.3.2",
+    'Markdown == 3.3.4',
+    'Jinja2 == 2.11.3',
+    'chardet == 4.0.0',
+    'python-markdown-math == 0.8',
+    'attributedict == 0.3.0'
+]
+requires-python = "~=3.8"
+description-file = "wiki/Simple Wiki/Главная.md"
+keywords = "wiki, engine, markdown, web, server"
+
+[tool.flit.metadata.urls]
+Bugtracker = "https://github.com/baterflyrity/pysimplewiki/issues"
+
+[tool.flit.scripts]
+simplewiki = "wiki:main"
