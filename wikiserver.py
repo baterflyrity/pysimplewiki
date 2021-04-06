@@ -17,7 +17,7 @@ from markdown import markdown
 
 from webserver import serve, default_response_callback
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 templates = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), autoescape=['html'])
 mimetypes.add_type('text/markdown', '.md', strict=False)
 mimetypes.add_type('font/woff', '.woff', strict=False)
