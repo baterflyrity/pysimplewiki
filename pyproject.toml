@@ -7,7 +7,7 @@ module = "wikiserver"
 author = "baterflyrity"
 author-email = "baterflyrity@yandex.ru"
 home-page = "https://github.com/baterflyrity/pysimplewiki"
-classifiers = [ "License :: OSI Approved :: MIT License",]
+classifiers = ["License :: OSI Approved :: MIT License", ]
 requires = [
     "typer[all] == 0.3.2",
     'Markdown == 3.3.4',
@@ -17,6 +17,7 @@ requires = [
     'attributedict == 0.3.0'
 ]
 requires-python = "~=3.8"
+dist-name = "pysimplewiki"
 description-file = "wiki\\Simple Wiki\\Главная.md"
 keywords = "wiki, engine, markdown, web, server"
 
