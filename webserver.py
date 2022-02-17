@@ -74,14 +74,15 @@ def serve(directory: Path = Path.cwd(), interface: str = '0.0.0.0', port: int = 
 			print('Connected by', addr)
 			request = client.recv(2048)  # according to https://stackoverflow.com/a/417184 maximum url length is up to 2000 characters so 2048 bytes buffer size must be enough ro receive main path header
 			requested_path = parse_request(request.decode('utf-8'))
-			print('\tRequested path ', requested_path)
-			requested_path = routing_callback(directory / Path(requested_path))
-			print('\tRouted path ', requested_path)
+			print('\tRequested path ', requested_path)			
 			if requested_path is not None:
-				if requested_path.is_relative_to(directory):
-					response = response_callback(requested_path)
-					if response is not None:
-						client.sendall(generate_response(*response))
-						print('\tSent data to client')
+				requested_path = routing_callback(directory / Path(requested_path))
+				print('\tRouted path ', requested_path)
+				if requested_path is not None:
+					if requested_path.is_relative_to(directory):
+						response = response_callback(requested_path)
+						if response is not None:
+							client.sendall(generate_response(*response))
+							print('\tSent data to client')
 			print('\tDisconnecting client\r\n')
 			client.close()

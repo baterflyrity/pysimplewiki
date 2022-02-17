@@ -291,14 +291,12 @@ def route(requested_path: Path) -> Optional[Path]:
 	cwd = Path.cwd()
 	if is_search_query(requested_path):
 		return requested_path
-	if len(requested_path.suffixes) == 0:
-		path = cwd / 'wiki' / requested_path.relative_to(cwd)
-		if not same_paths(path, cwd / 'wiki'):
-			for file in path.parent.glob(f'{path.name}.*'):
-				return file
-		if path.exists() and path.is_dir():
-			return path
-		return None
+	path = cwd / 'wiki' / requested_path.relative_to(cwd)
+	if not same_paths(path, cwd / 'wiki'):
+		for file in path.parent.glob(f'{path.name}.*'):
+			return file
+	if path.exists() and path.is_dir():
+		return path
 	else:
 		path = cwd / 'wiki' / requested_path.relative_to(cwd)
 		if path.exists() and path.is_file():
