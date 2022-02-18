@@ -8,6 +8,19 @@ from typing import Optional, Callable, Tuple
 from urllib.parse import urlparse
 
 
+def normalized_path(path: Path) -> str:
+	tmp = 'ktGjgtGybFytFHGfJGFgjFfVhgFGHgvGvbfASDWDwD'
+	if path.is_dir():
+		return str(path.absolute() / tmp).replace(tmp, '')
+	else:
+		return str(path.absolute())
+
+
+def is_relative_to(path: Path, root_dir: Path) -> bool:
+	base = normalized_path(root_dir)
+	return normalized_path(path)[:len(base)] == base
+
+
 def parse_request(text: str) -> Optional[str]:
 	"""
 	Parse HTTP request and return requested path or None.
@@ -29,12 +42,7 @@ def generate_response(body: bytes, type: str = None) -> bytes:
 	Generate HTTP 1.0 response with 200 status code, Content-Length, Content-Type and Connection: close headers.
 	"""
 	charset = '; charset=utf-8' if type.startswith('text') else ''
-	return ('\r\n'.join([
-		'HTTP/1.1 200 OK',
-		f'Content-Length: {len(body)}',
-		f'Content-Type: {type or "application/octet-stream"}{charset}',
-		'Connection: close',
-	]) + '\r\n\r\n').encode('utf-8') + body
+	return ('\r\n'.join(['HTTP/1.1 200 OK', f'Content-Length: {len(body)}', f'Content-Type: {type or "application/octet-stream"}{charset}', 'Connection: close', ]) + '\r\n\r\n').encode('utf-8') + body
 
 
 def default_routing_callback(requested_path: Path) -> Optional[Path]:
@@ -74,12 +82,12 @@ def serve(directory: Path = Path.cwd(), interface: str = '0.0.0.0', port: int = 
 			print('Connected by', addr)
 			request = client.recv(2048)  # according to https://stackoverflow.com/a/417184 maximum url length is up to 2000 characters so 2048 bytes buffer size must be enough ro receive main path header
 			requested_path = parse_request(request.decode('utf-8'))
-			print('\tRequested path ', requested_path)			
+			print('\tRequested path ', requested_path)
 			if requested_path is not None:
 				requested_path = routing_callback(directory / Path(requested_path))
 				print('\tRouted path ', requested_path)
 				if requested_path is not None:
-					if requested_path.is_relative_to(directory):
+					if is_relative_to(requested_path, directory):
 						response = response_callback(requested_path)
 						if response is not None:
 							client.sendall(generate_response(*response))

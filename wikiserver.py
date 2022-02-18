@@ -15,7 +15,7 @@ import typer
 from attributedict.collections import AttributeDict
 from markdown import markdown
 
-from webserver import serve, default_response_callback
+from webserver import serve, default_response_callback, is_relative_to
 
 __version__ = '0.1.2'
 templates = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), autoescape=['html'])
@@ -24,22 +24,22 @@ mimetypes.add_type('font/woff', '.woff', strict=False)
 mimetypes.add_type('font/woff2', '.woff2', strict=False)
 config = AttributeDict(json.loads((Path.cwd() / 'config.json').read_text()))
 parsers = {
-	'.md': lambda text: markdown(text, extensions=['extra', 'mdx_math', 'admonition', 'toc', 'internallinks'] + config['markdown_extensions'], extension_configs={
-		'extra'        : {
-			'footnotes'  : {
+	'.md': lambda text: markdown(text, extensions=['extra', 'mdx_math', 'admonition', 'toc', 'wikilinks'] + config['markdown_extensions'], extension_configs={
+		'extra':     {
+			'footnotes':   {
 				'UNIQUE_IDS': True
 			},
 			'fenced_code': {
 				'lang_prefix': 'lang-'
 			}
 		},
-		'mdx_math'     : {
+		'mdx_math':  {
 			'enable_dollar_delimiter': True,
-			'add_preview'            : True
+			'add_preview':             True
 		},
-		'internallinks': {
-			'pattern'  : r'\[\[([\w0-9_ -/#]+)\]\]',
-			'end_url'  : '',
+		'wikilinks': {
+			# 'pattern':   r'\[\[([\w0-9_ -/#]+)\]\]',
+			'end_url':   '',
 			'build_url': make_internal_link
 		}
 	}),
@@ -66,7 +66,7 @@ class WikiLink:
 		"""
 		Generate link from file system path.
 		"""
-		if not wiki_link_path.is_relative_to(wiki_root_path):
+		if not is_relative_to(wiki_link_path, wiki_root_path):
 			raise ValueError(f'Wiki path {wiki_link_path} must be relative to root {wiki_root_path}.')
 		if not is_page(wiki_link_path) and not is_section(wiki_link_path):
 			raise ValueError(f'Wiki path must point to page or section not to resource.')
@@ -171,18 +171,18 @@ def is_page(wiki_path: Path) -> bool:
 
 
 def is_resource(path: Path) -> bool:
-	return path.is_relative_to(Path.cwd() / 'resources')
+	return is_relative_to(path, Path.cwd() / 'resources')
 
 
 def is_wiki_page(path: Path) -> bool:
-	return path.is_relative_to(Path.cwd() / 'wiki')
+	return is_relative_to(path, Path.cwd() / 'wiki')
 
 
 def is_search_query(path: Path) -> bool:
 	cwd = Path.cwd()
 	search_path = cwd / 'search'
 	# noinspection PyUnboundLocalVariable
-	return not same_paths(path, search_path) and path.is_relative_to(search_path) and len(parents := path.relative_to(search_path).parents) == 1 and same_paths(search_path, search_path / parents[0])
+	return not same_paths(path, search_path) and is_relative_to(path, search_path) and len(parents := path.relative_to(search_path).parents) == 1 and same_paths(search_path, search_path / parents[0])
 
 
 def get_query(search_query: Path) -> Optional[str]:
@@ -198,10 +198,10 @@ def generate_sidebar(current_wiki_path: Path) -> str:
 	main_links = [WikiLink(name='Заглавная страница', url='/', page=False)]
 	if not same_paths(current_wiki_path, wiki_path):
 		# current section
-		if current_wiki_path.parent.is_relative_to(wiki_path) and not same_paths(current_wiki_path.parent, wiki_path):
+		if is_relative_to(current_wiki_path.parent, wiki_path) and not same_paths(current_wiki_path.parent, wiki_path):
 			main_links.append(WikiLink.from_path(current_wiki_path.parent, wiki_path))
 		# supsection
-		if not is_section(current_wiki_path) and current_wiki_path.parent.parent.is_relative_to(wiki_path) and not same_paths(current_wiki_path.parent.parent, wiki_path):
+		if not is_section(current_wiki_path) and is_relative_to(current_wiki_path.parent.parent, wiki_path) and not same_paths(current_wiki_path.parent.parent, wiki_path):
 			main_links.append(WikiLink.from_path(current_wiki_path.parent.parent, wiki_path))
 	main_block = generate_side_block(main_links, sort=False)
 	search_section = current_wiki_path
@@ -335,7 +335,8 @@ def response(requested_path: Path) -> Optional[Tuple[bytes, str]]:
 		return None
 
 
-def cli(interface: str = typer.Option(config['interface'], '--interface', '-i', help='Interface IP v4 address or resolvable name (like "127.0.0.1" or "localhost") on which to serve wiki. Default value is "0.0.0.0" for all connected interfaces. Overwrites config.json.'), port: int = typer.Option(config['port'], '--port', '-p', help='Port on which to serve wiki. Default value is 80 for all connected interfaces. Overwrites config.json.', callback=validate_port), version: Optional[bool] = typer.Option(None, "--version", callback=show_version, is_eager=True, help=show_version.__doc__)):
+def cli(interface: str = typer.Option(config['interface'], '--interface', '-i', help='Interface IP v4 address or resolvable name (like "127.0.0.1" or "localhost") on which to serve wiki. Default value is "0.0.0.0" for all connected interfaces. Overwrites config.json.'), port: int = typer.Option(config['port'], '--port', '-p', help='Port on which to serve wiki. Default value is 80 for all connected interfaces. Overwrites config.json.', callback=validate_port),
+        version: Optional[bool] = typer.Option(None, "--version", callback=show_version, is_eager=True, help=show_version.__doc__), debug: bool = typer.Option(False, '--debug', help='Print more information about errors.')):
 	"""
 	Run wiki server.
 	"""
@@ -343,6 +344,8 @@ def cli(interface: str = typer.Option(config['interface'], '--interface', '-i', 
 		serve(interface=interface, port=port, routing_callback=route, response_callback=response)
 	except Exception as error:
 		typer.secho(str(error), fg=typer.colors.RED, err=True)
+		if debug:
+			raise
 		typer.Exit(-1)
 
 
