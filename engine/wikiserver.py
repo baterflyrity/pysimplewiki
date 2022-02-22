@@ -6,8 +6,7 @@ import mimetypes
 import random
 import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Optional, Tuple, List, Callable
+from typing import Callable, List, Optional
 
 import chardet
 import jinja2
@@ -15,7 +14,9 @@ import typer
 from attributedict.collections import AttributeDict
 from markdown import markdown
 
-from webserver import serve, default_response_callback, is_relative_to
+from engine.responses import DataResponse, FileResponse, NotFoundResponse, Response
+from engine.webserver import serve
+from engine.path import Path
 
 __version__ = '0.1.2'
 templates = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'), autoescape=['html'])
@@ -228,7 +229,7 @@ def generate_page(content: str, current_wiki_path: Path) -> str:
 	"""
 	Generate page markup for content markup part.
 	"""
-	resources_root = Path('resources')
+	resources_root = Path('../resources')
 	icon_path = resources_root / config['icon']
 	if icon_path.exists() and icon_path.is_file():
 		icon_path = f'/{config["icon"]}'
@@ -307,32 +308,32 @@ def route(requested_path: Path) -> Optional[Path]:
 	return None
 
 
-def response(requested_path: Path) -> Optional[Tuple[bytes, str]]:
+def response(requested_path: Path) -> Response:
 	query = get_query(requested_path)
 	if query is not None:
-		return generate_page(generate_search_results(query), requested_path).encode('utf-8'), 'text/html'
+		return DataResponse(generate_page(generate_search_results(query), requested_path).encode('utf-8'), 'text/html')
 	elif is_resource(requested_path):
-		return default_response_callback(requested_path)
+		return FileResponse(requested_path)
 	elif is_wiki_page(requested_path):
 		if is_section(requested_path):
 			content = generate_section_content(requested_path)
 		elif requested_path.exists() and requested_path.is_file():
 			mime = mimetypes.guess_type(requested_path, strict=False)[0]
 			if mime is None or 'text' not in mime:
-				return default_response_callback(requested_path)
+				return FileResponse(requested_path)
 			content = requested_path.read_bytes()
 			try:
 				content = content.decode(chardet.detect(content)['encoding'])
 			except UnicodeDecodeError:
-				return default_response_callback(requested_path)
+				return FileResponse(requested_path)
 			content_type = requested_path.suffix
 			if content_type in parsers:
 				content = parsers[content_type](content)
 		else:
-			return None
-		return generate_page(content, requested_path).encode('utf-8'), 'text/html'
+			return NotFoundResponse()
+		return DataResponse(generate_page(content, requested_path).encode('utf-8'), 'text/html')
 	else:
-		return None
+		return NotFoundResponse()
 
 
 def cli(interface: str = typer.Option(config['interface'], '--interface', '-i', help='Interface IP v4 address or resolvable name (like "127.0.0.1" or "localhost") on which to serve wiki. Default value is "0.0.0.0" for all connected interfaces. Overwrites config.json.'), port: int = typer.Option(config['port'], '--port', '-p', help='Port on which to serve wiki. Default value is 80 for all connected interfaces. Overwrites config.json.', callback=validate_port),
@@ -341,7 +342,7 @@ def cli(interface: str = typer.Option(config['interface'], '--interface', '-i', 
 	Run wiki server.
 	"""
 	try:
-		serve(interface=interface, port=port, routing_callback=route, response_callback=response)
+		serve(interface=interface, port=port, router=route, handle=response)
 	except Exception as error:
 		typer.secho(str(error), fg=typer.colors.RED, err=True)
 		if debug:
