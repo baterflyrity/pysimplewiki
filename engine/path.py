@@ -20,7 +20,3 @@ class Path(type(PathBase())):
 
 	def _append_slash(self) -> str:
 		return str(self.absolute() / _IMPOSSIBLE_FILE_NAME).removesuffix(_IMPOSSIBLE_FILE_NAME)
-	#
-	# @classmethod
-	# def cwd(cls) -> Path:
-	# 	return PathBase.cwd()

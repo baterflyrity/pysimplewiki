@@ -1,6 +1,7 @@
 """Simple HTTP 1.1 web server."""
 import re
 import socket
+import sys
 import urllib
 from typing import Callable, Optional
 from urllib.parse import urlparse
@@ -67,3 +68,10 @@ def serve(interface: str = '0.0.0.0', port: int = 80, router: Router = FileSyste
 				client.close()
 		except KeyboardInterrupt:
 			print('Exit')
+
+
+if __name__ == '__main__':
+	print('Treating first and second arguments as interface and port.')
+	interface = sys.argv[1] if len(sys.argv) >= 2 else '0.0.0.0'
+	port = int(sys.argv[2]) if len(sys.argv) >= 3 else 80
+	serve(interface=interface, port=port)
