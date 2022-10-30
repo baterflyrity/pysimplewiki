@@ -49,7 +49,7 @@ def serve(interface: str = '0.0.0.0', port: int = 80, router: Router = FileSyste
 
 	:param interface: Interface IP v4 address or resolvable name (like "127.0.0.1" or "localhost") on which to serve. Use "0.0.0.0" for all connected interfaces.
 	:param port: Port on which to serve.
-	:param router: routing callback that must return requested path, or url string for redirection or None for 404 Error.
+	:param router: routing callback that must return requested path or None for 404 Error.
 	:param handle:  response body generation callback that must return bytes and MIME type or None.
 	"""
 	print(f'Hosting at http://{interface or "localhost"}:{port} of {Path.cwd().absolute()}.')
