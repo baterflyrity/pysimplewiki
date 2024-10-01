@@ -16,10 +16,10 @@ requires = [
     'python-markdown-math == 0.8',
     'attributedict == 0.3.0'
 ]
-requires-python = "~=3.8"
+requires-python = "~=3.11"
 dist-name = "pysimplewiki"
 description-file = "wiki\\Simple Wiki\\Главная.md"
-keywords = "wiki, engine, markdown, web, server"
+keywords = "wiki, engine, markdown, web, server, file, browser"
 
 [tool.flit.metadata.urls]
 Bugtracker = "https://github.com/baterflyrity/pysimplewiki/issues"

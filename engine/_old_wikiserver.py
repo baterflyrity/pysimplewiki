@@ -256,7 +256,7 @@ def generate_section_content(path: Path) -> str:
 
 def match(query, text) -> bool:
 	"""
-	Match test with query.
+	Match text with query.
 	"""
 	if len(query) < 3 or len(text) == 0:
 		return False

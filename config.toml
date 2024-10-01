@@ -1,0 +1,7 @@
+short_title= "Simple Wiki"
+full_title = "Simple Wiki"
+icon = "favicon.ico"
+logo = "logo.html"
+mermaid_theme = "neutral"
+interface = "0.0.0.0"
+port = 80
