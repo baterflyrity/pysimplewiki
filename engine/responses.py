@@ -4,7 +4,6 @@ from engine.path import Path
 
 class Response:
 
-
 	def __init__(self, code: int, text: str):
 		self.text = text
 		self.code = code
@@ -18,7 +17,6 @@ class Response:
 
 class RedirectResponse(Response):
 
-
 	def __init__(self, url: str):
 		super().__init__(301, 'Moved Permanently')
 		self.url = url
@@ -29,13 +27,11 @@ class RedirectResponse(Response):
 
 class NotFoundResponse(Response):
 
-
 	def __init__(self):
 		super().__init__(404, 'Not Found')
 
 
 class DataResponse(Response):
-
 
 	def __init__(self, data: bytes, mime: str = 'application/octet-stream'):
 		super().__init__(200, 'OK')
@@ -51,21 +47,19 @@ class DataResponse(Response):
 
 class FileResponse(DataResponse):
 
-
 	def __init__(self, file: Path):
 		if not file.is_file():
 			raise ValueError(f'Can not read file at {file}.')
-		super().__init__(file.read_bytes(), mimetypes.guess_type(file, strict=False)[0])
+		super().__init__(file.read_bytes(), mimetypes.guess_type(file, strict=False)[0] or 'application/octet-stream')
 
 
 class ServerErrorReponse(Response):
 
-
 	def __init__(self):
 		super().__init__(500, 'Internal Server Error')
 
-class BadRequestReponse(Response):
 
+class BadRequestReponse(Response):
 
 	def __init__(self):
 		super().__init__(400, 'Bad Request')
