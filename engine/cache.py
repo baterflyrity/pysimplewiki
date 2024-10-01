@@ -5,6 +5,7 @@ from hashlib import md5, sha1
 
 from engine.converters import get_content
 from engine.path import Path
+from engine.logging import logger
 
 
 @dataclasses.dataclass
@@ -38,7 +39,6 @@ class CachedFile:
 
 class Cache:
 
-
 	def __init__(self, path: Path, root: Path = Path.cwd() / 'wiki', preload: bool = True):
 		self._version = 1
 		self.path = path
@@ -61,13 +61,14 @@ class Cache:
 			self.save()
 
 	def preload(self):
+		logger.info('Preloading cache...')
 		old_files = set(self.files)
 		for entry in self.root.rglob('*'):
 			if entry.is_file():
 				self.get_content(entry, save=False)
 		preloaded_files = set(self.files) - old_files
 		if len(preloaded_files):
-			print(f'Preloaded {len(preloaded_files)} article pages from {", ".join(preloaded_files)}.')
+			logger.info(f'Preloaded {len(preloaded_files)} article pages from {", ".join(preloaded_files)}.')
 		self.save()
 
 	def get_content(self, file: Path, save: bool = True) -> str | None:
@@ -86,7 +87,7 @@ class Cache:
 	def serialize(self) -> dict[str, int | dict[str, dict[str, str]]]:
 		return {
 			'version': self._version,
-			'files':   {p: f.serialize() for p, f in self.files.items()}
+			'files'  : {p: f.serialize() for p, f in self.files.items()}
 		}
 
 	def deserialize(self, data: dict[str, ...]):
