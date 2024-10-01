@@ -1,0 +1,27 @@
+.idea/
+__pycache__/
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+*.DS_Store
+Thumbs.db
+.prof
+dist
+
+resources/favicon1.png
+resources/logo.png
+resources/logo лис.html
+resources/logo лис.svg
+resources/logo1.html
+resources/media/
+cache.pkl
