@@ -64,7 +64,7 @@ class Cache:
 		logger.info('Preloading cache...')
 		old_files = set(self.files)
 		for entry in self.root.rglob('*'):
-			if entry.is_file():
+			if entry.is_file() and not entry.name.startswith('.') and all([not parent.name.startswith('.') for parent in entry.parents]):
 				self.get_content(entry, save=False)
 		preloaded_files = set(self.files) - old_files
 		if len(preloaded_files):

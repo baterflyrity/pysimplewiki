@@ -112,7 +112,6 @@ class IPage(ABC):
 
 class SearchPage(IPage):
 
-
 	@property
 	def content(self) -> str:
 		return render('search_results.html', query=self.request.query, found=[Link.from_path(self.request.root / x, None, self.request.root) for x in self.found])
@@ -143,7 +142,11 @@ class SearchPage(IPage):
 		super().__init__(request)
 		self.found = set()
 		for path in request.root.rglob('*'):
-			if not path.is_dir() and not path.is_file():
+			if any([
+				not path.is_dir() and not path.is_file(),
+				path.name.startswith('.'),
+				all([not parent.name.startswith('.') for parent in path.parents]),
+			]):
 				continue
 			if SearchPage.match_text(request.query, str(path.relative_to(request.root))):
 				self.found.add(path.relative_to(self.request.root))
@@ -156,10 +159,9 @@ class SearchPage(IPage):
 
 class SectionPage(IPage):
 
-
 	@property
 	def content(self) -> str:
-		links = [Link.from_path(x, None, self.request.root) for x in self.current_path.glob('*') if x.is_file() or x.is_dir()]
+		links = [Link.from_path(x, None, self.request.root) for x in self.current_path.glob('*') if (x.is_file() or x.is_dir()) and not x.name.startswith('.')]
 		return render('section.html', section=self.current_path.name, subsections=[x for x in links if x.type == LinkType.Section], pages=[x for x in links if x.type == LinkType.Article])
 
 	@property
@@ -178,7 +180,6 @@ class SectionPage(IPage):
 
 
 class FilePage(IPage):
-
 
 	@property
 	def content(self) -> str | Response:

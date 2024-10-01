@@ -44,6 +44,8 @@ class FileSystemRouter:
 
 	def _process_wiki_request(self, requested_path: Path) -> Optional[IRequest]:
 		requested_path = FileSystemRouter._resolve_path(self.wiki_root, requested_path)
+		if requested_path.name.startswith('.'):
+			return SearchRequest(requested_path.name, self.wiki_root)
 		if requested_path.is_dir():
 			return SectionRequest(requested_path, self.wiki_root)
 		if requested_path.is_file():

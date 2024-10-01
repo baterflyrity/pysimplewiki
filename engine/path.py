@@ -23,7 +23,6 @@ class FileContentDescription:
 
 class Path(type(PathBase())):
 
-
 	# Interface unification for Linux and Windows.
 	def is_relative_to(self, root: Path) -> bool:
 		path = self._append_slash()
@@ -115,6 +114,18 @@ class Path(type(PathBase())):
 	def to_url_format(self) -> str:
 		"Make web style slashes."
 		return str(self).replace('\\', '/')
+
+	def glob(self, pattern, *, case_sensitive: bool | None = None, ignore_dotted: bool = True) -> list[Path]:
+		return sorted(Path(entry) for entry in super().glob(pattern, case_sensitive=case_sensitive) if not ignore_dotted or not entry.name.startswith('.'))
+
+	def rglob(self, pattern, *, case_sensitive=None, ignore_dotted: bool = True) -> list[Path]:
+		entries = []
+		for entry in self.glob(pattern, case_sensitive=case_sensitive, ignore_dotted=ignore_dotted):
+			if entry.is_dir():
+				entries += entry.rglob(pattern, case_sensitive=case_sensitive, ignore_dotted=ignore_dotted)
+			else:
+				entries.append(entry)
+		return sorted(entries)
 
 
 def make_relative_url(root: str | Path, path: Path, *, drop_extension: bool = False) -> str:
