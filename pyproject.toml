@@ -14,7 +14,8 @@ requires = [
     'Jinja2 == 2.11.3',
     'chardet == 4.0.0',
     'python-markdown-math == 0.8',
-    'attributedict == 0.3.0'
+    'attributedict == 0.3.0',
+    'loguru'
 ]
 requires-python = "~=3.11"
 dist-name = "pysimplewiki"

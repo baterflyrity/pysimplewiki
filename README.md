@@ -1,3 +1,6 @@
 # Simple Wiki
 
-[Подробнее](https://github.com/baterflyrity/pysimplewiki/blob/main/wiki/Simple%20Wiki/Главная.md)
+```shell
+docker compose up -d
+```
+

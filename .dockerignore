@@ -1,0 +1,4 @@
+wiki/
+cache.pkl
+.idea/
+**/__pycache__/

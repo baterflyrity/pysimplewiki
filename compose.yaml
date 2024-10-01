@@ -1,0 +1,11 @@
+name: simple-wiki
+services:
+    wiki:
+        image:   baterflyrity/pysimplewiki
+        environment:
+            DEBUG: ''
+        restart: always
+        ports:
+            - '80:8000'
+        volumes:
+            - './wiki:/app/wiki'
