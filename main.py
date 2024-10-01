@@ -1,8 +1,9 @@
+from time import sleep
 from typing import Annotated
 
 import typer
-from rich import print
 
+from engine.logging import logger
 from engine.settings import settings
 
 __version__ = '0.2.0'
@@ -36,17 +37,27 @@ def cli(
 		port: Annotated[int, typer.Option('--port', '-p', help='Port on which to serve wiki. Default value is 80 for all connected interfaces. Overwrites config.json.', callback=validate_port, show_default=True, envvar='WIKI_PORT')] = settings['port'],
 		version: Annotated[bool, typer.Option("--version", callback=show_version, is_eager=True, help=show_version.__doc__)] = False,
 		debug: Annotated[bool, typer.Option('--debug', help='Print more information about errors.', show_default=True, envvar='DEBUG')] = False,
+		restart: Annotated[bool, typer.Option('--restart', help='Self-restart on critical error.', show_default=True, envvar='WIKI_RESTART')] = False,
+
 ):
 	"""
 	Run wiki server.
 	"""
-	try:
-		serve(interface=interface, port=port)
-	except Exception as e:
-		print(f'[red]{e}[/]')
-		if debug:
-			raise
-		typer.Exit(-1)
+	while True:
+		try:
+			logger.info('Starting Simple Wiki...')
+			serve(interface=interface, port=port, buble_sigint=True)
+		except KeyboardInterrupt:
+			raise typer.Exit(0)
+		except Exception as e:
+			logger.critical(f'Critical error: {e}')
+			logger.exception(e)
+			if debug:
+				raise
+			if not restart:
+				raise typer.Exit(-1)
+		logger.info('Restarting in 5 seconds...')
+		sleep(5)
 
 
 if __name__ == '__main__':
